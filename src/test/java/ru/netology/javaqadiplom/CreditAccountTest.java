@@ -1,6 +1,5 @@
 package ru.netology.javaqadiplom;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,17 +42,23 @@ public class CreditAccountTest {
     }
 
     @Test
+    public void constructorShouldThrowExceptionWhenInitialBalanceIsNegative() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new CreditAccount(-1000, 5000, 15));
+    }
+
+    @Test
     public void payShouldDecreaseBalanceWithinCreditLimit() {
         CreditAccount account = new CreditAccount(1000, 5000, 15);
         assertTrue(account.pay(3000));
-        assertEquals(-2000, account.getBalance()); // 1000 - 3000 = -2000 (в пределах лимита -5000)
+        assertEquals(-2000, account.getBalance());
     }
 
     @Test
     public void payShouldReturnFalseAndNotChangeBalanceWhenExceedsLimit() {
         CreditAccount account = new CreditAccount(1000, 5000, 15);
         int initialBalance = account.getBalance();
-        assertFalse(account.pay(7000)); // 1000 - 7000 = -6000, лимит -5000 – превышение
+        assertFalse(account.pay(7000));
         assertEquals(initialBalance, account.getBalance());
     }
 
@@ -67,14 +72,21 @@ public class CreditAccountTest {
     }
 
     @Test
-    public void add_shouldIncreaseBalanceByAmount() {
+    public void payShouldWorkExactlyAtCreditLimit() {
         CreditAccount account = new CreditAccount(1000, 5000, 15);
-        assertTrue(account.add(3000));
-        assertEquals(4000, account.getBalance()); // 1000 + 3000 = 4000
+        assertTrue(account.pay(6000));
+        assertEquals(-5000, account.getBalance());
     }
 
     @Test
-    public void add_shouldReturnFalseForNegativeOrZeroAmount() {
+    public void addShouldIncreaseBalanceByAmount() {
+        CreditAccount account = new CreditAccount(1000, 5000, 15);
+        assertTrue(account.add(3000));
+        assertEquals(4000, account.getBalance());
+    }
+
+    @Test
+    public void addShouldReturnFalseForNegativeOrZeroAmount() {
         CreditAccount account = new CreditAccount(1000, 5000, 15);
         int initialBalance = account.getBalance();
         assertFalse(account.add(0));
@@ -83,21 +95,36 @@ public class CreditAccountTest {
     }
 
     @Test
-    public void yearChange_shouldCalculateInterestForNegativeBalance() {
+    public void addShouldWorkWithNegativeBalance() {
+        CreditAccount account = new CreditAccount(0, 5000, 15);
+        account.pay(3000);
+        assertTrue(account.add(1000));
+        assertEquals(-2000, account.getBalance());
+    }
+
+    @Test
+    public void yearChangeShouldCalculateInterestForNegativeBalance() {
         CreditAccount account = new CreditAccount(0, 5000, 15);
         account.pay(200); // баланс = -200
-        assertEquals(-30, account.yearChange()); // -200 / 100 * 15 = -30
+        assertEquals(-30, account.yearChange());
     }
 
     @Test
-    public void yearChange_shouldReturnZeroForPositiveBalance() {
+    public void yearChangeShouldReturnZeroForPositiveBalance() {
         CreditAccount account = new CreditAccount(200, 5000, 15);
-        assertEquals(0, account.yearChange()); // ожидается 0, а в реализации будет 30 – баг.
+        assertEquals(0, account.yearChange());
     }
 
     @Test
-    public void yearChange_shouldReturnZeroForZeroBalance() {
+    public void yearChangeShouldReturnZeroForZeroBalance() {
         CreditAccount account = new CreditAccount(0, 5000, 15);
         assertEquals(0, account.yearChange());
+    }
+
+    @Test
+    public void yearChangeShouldCalculateInterestForNegativeBalanceTwo() {
+        CreditAccount account = new CreditAccount(0, 5000, 15);
+        account.pay(125); // баланс = -125
+        assertEquals(-18, account.yearChange());
     }
 }
