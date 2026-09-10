@@ -5,10 +5,20 @@ public class Account {
     protected int rate;
 
     public boolean pay(int amount) {
+        if (amount > 0) {
+            if (balance >= amount) {
+                balance -= amount;
+                return true;
+            }
+        }
         return false;
     }
 
     public boolean add(int amount) {
+        if (amount > 0) {
+            balance += amount;
+            return true;
+        }
         return false;
     }
 
