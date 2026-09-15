@@ -61,4 +61,14 @@ public class BankTest {
         int amount = 100;
         Assertions.assertFalse(manager.transfer(from, to, amount));
     }
+
+    @Test
+    public void transferTestCancelFromPayIfToAddFalse() {
+        Account to = Mockito.mock(Account.class);
+        doReturn(false).when(to).add(100);
+        from.add(200);
+        int amount = 100;
+        manager.transfer(from, to, amount);
+        Assertions.assertEquals(200, from.getBalance());
+    }
 }
